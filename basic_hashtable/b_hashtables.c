@@ -140,8 +140,17 @@ char *hash_table_retrieve(BasicHashTable *table, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(BasicHashTable *ht)
+void destroy_hash_table(BasicHashTable *table)
 {
+  for (int i = 0; i < table->capacity - 1; i++)
+  {
+    if (table->storage[i])
+    {
+      destroy_pair(table->storage[i]);
+    }
+  }
+  free(table->storage);
+  free(table);
 }
 
 #ifndef TESTING
