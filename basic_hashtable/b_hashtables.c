@@ -110,8 +110,11 @@ void hash_table_insert(BasicHashTable *table, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_remove(BasicHashTable *ht, char *key)
+void hash_table_remove(BasicHashTable *table, char *key)
 {
+  int index = hash(key, 16);
+  destroy_pair(table->storage[index]);
+  table->storage[index] = NULL;
 }
 
 /****
