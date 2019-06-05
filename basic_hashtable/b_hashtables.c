@@ -122,9 +122,17 @@ void hash_table_remove(BasicHashTable *table, char *key)
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
+char *hash_table_retrieve(BasicHashTable *table, char *key)
 {
-  return NULL;
+  int index = hash(key, 16);
+  if (table->storage[index] != NULL)
+  {
+    return table->storage[index];
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
