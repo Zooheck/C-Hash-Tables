@@ -87,8 +87,22 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_insert(BasicHashTable *ht, char *key, char *value)
+void hash_table_insert(BasicHashTable *table, char *key, char *value)
 {
+  // hash the key passed in to the function
+  int index = hash(key, table->capacity);
+  // if there is a value at this index...
+  if (table->storage[index] != NULL)
+  {
+    // destroy the key-value pair
+    destroy_pair(table->storage[index]);
+    // add the new key-value pair in the newly empty place
+    table->storage[index] = create_pair(key, value);
+  }
+  else // AKA: The bucket is unoccupied and we can fill it in
+  {
+    table->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
