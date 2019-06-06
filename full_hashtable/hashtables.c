@@ -123,7 +123,7 @@ void hash_table_insert(HashTable *table, char *key, char *value)
     {
       item->next = create_pair(key, value);
     }
-    }
+  }
 }
 
 /*
@@ -134,8 +134,47 @@ void hash_table_insert(HashTable *table, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  */
-void hash_table_remove(HashTable *ht, char *key)
+void hash_table_remove(HashTable *table, char *key)
 {
+  int index = hash(key, table->capacity);
+  LinkedPair *item = table->storage[index];
+  while (strcmp(item->key, key) == 0)
+  {
+    if (item->next == NULL)
+    {
+      destroy_pair(item);
+      table->storage[index] = NULL;
+      break;
+    }
+    else
+    {
+      LinkedPair *temp = item;
+      item = item->next;
+      destroy_pair(temp);
+    }
+  }
+
+  if (table->storage[index])
+  {
+    while (item->next != NULL)
+    {
+      LinkedPair *nextItem = item->next;
+      if (strcmp(nextItem->key, key) == 0)
+      {
+        item->next = nextItem->next;
+        destroy_pair(nextItem);
+      }
+      else
+      {
+        item = item->next;
+      }
+    }
+    if (strcmp(node->next->key, key) == 0)
+    {
+      destroy_pair(node->next);
+      node->next = NULL;
+    }
+  }
 }
 
 /*
@@ -146,8 +185,18 @@ void hash_table_remove(HashTable *ht, char *key)
 
   Return NULL if the key is not found.
  */
-char *hash_table_retrieve(HashTable *ht, char *key)
+char *hash_table_retrieve(HashTable *table, char *key)
 {
+  int i = hash(key, table->capacity);
+  LinkedPair *current = table->storage[i];
+  while (current)
+  {
+    if (strcmp(current->key, key) == 0)
+    {
+      return current->value;
+    }
+    current = current->next;
+  }
   return NULL;
 }
 
