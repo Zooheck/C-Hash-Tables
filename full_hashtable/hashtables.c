@@ -205,8 +205,21 @@ char *hash_table_retrieve(HashTable *table, char *key)
 
   Don't forget to free any malloc'ed memory!
  */
-void destroy_hash_table(HashTable *ht)
+void destroy_hash_table(HashTable *table)
 {
+  for (int i = 0; i < table->capacity; i++)
+  {
+    LinkedPair *current = table->storage[i];
+    LinkedPair *next;
+    while (current)
+    {
+      next = current->next;
+      destroy_pair(current);
+      current = next;
+    }
+  }
+  free(table->storage);
+  free(ht);
 }
 
 /*
