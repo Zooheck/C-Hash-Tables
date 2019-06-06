@@ -95,8 +95,35 @@ HashTable *create_hash_table(int capacity)
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  */
-void hash_table_insert(HashTable *ht, char *key, char *value)
+void hash_table_insert(HashTable *table, char *key, char *value)
 {
+  // hash the key to get the index
+  int index = hash(key, table->capacity);
+  if (table->storage[index] == NULL)
+  {
+    table->storage[index] = create_pair(key, value);
+  }
+  else
+  {
+    LinkedPair *item = table->storage[index];
+    while (item->next != NULL)
+    {
+      if (strcmp(item->key, key) == 0)
+      {
+        item->value = value;
+        break
+      }
+      item = item->next;
+    }
+    if (strcmp(item->key, key) == 0)
+    {
+      item->value = value;
+    }
+    else
+    {
+      item->next = create_pair(key, value);
+    }
+    }
 }
 
 /*
