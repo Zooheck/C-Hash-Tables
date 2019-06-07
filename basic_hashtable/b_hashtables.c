@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
-typedef struct Pair {
+typedef struct Pair
+{
   char *key;
   char *value;
 } Pair;
@@ -14,7 +14,8 @@ typedef struct Pair {
 /****
   Basic hash table
  ****/
-typedef struct BasicHashTable {
+typedef struct BasicHashTable
+{
   int capacity;
   Pair **storage;
 } BasicHashTable;
@@ -36,7 +37,8 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -52,15 +54,15 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
   return hash % max;
 }
-
 
 /****
   Fill this in.
@@ -70,9 +72,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
-  return ht;
+  // allocate memory for the hash table skeleton
+  BasicHashTable *table = malloc(sizeof(BasicHashTable));
+  // initialize storage buckets; each bucket contains NULL value
+  table->storage = calloc(capacity, sizeof(Pair *));
+  table->capacity = capacity;
+  return table;
 }
 
 /****
@@ -82,9 +87,22 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_insert(BasicHashTable *ht, char *key, char *value)
+void hash_table_insert(BasicHashTable *table, char *key, char *value)
 {
-
+  // hash the key passed in to the function
+  int index = hash(key, table->capacity);
+  // if there is a value at this index...
+  if (table->storage[index] != NULL)
+  {
+    // destroy the key-value pair
+    destroy_pair(table->storage[index]);
+    // add the new key-value pair in the newly empty place
+    table->storage[index] = create_pair(key, value);
+  }
+  else // AKA: The bucket is unoccupied and we can fill it in
+  {
+    table->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -92,9 +110,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_remove(BasicHashTable *ht, char *key)
+void hash_table_remove(BasicHashTable *table, char *key)
 {
-
+  int index = hash(key, 16);
+  destroy_pair(table->storage[index]);
+  table->storage[index] = NULL;
 }
 
 /****
@@ -102,9 +122,17 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
+char *hash_table_retrieve(BasicHashTable *table, char *key)
 {
-  return NULL;
+  int index = hash(key, 16);
+  if (table->storage[index] != NULL)
+  {
+    return table->storage[index];
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
@@ -112,11 +140,18 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(BasicHashTable *ht)
+void destroy_hash_table(BasicHashTable *table)
 {
-
+  for (int i = 0; i < table->capacity - 1; i++)
+  {
+    if (table->storage[i])
+    {
+      destroy_pair(table->storage[i]);
+    }
+  }
+  free(table->storage);
+  free(table);
 }
-
 
 #ifndef TESTING
 int main(void)
@@ -129,9 +164,12 @@ int main(void)
 
   hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
     printf("...gone tomorrow. (success)\n");
-  } else {
+  }
+  else
+  {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
 
